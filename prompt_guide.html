@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI Bot Prompt Guide</title>
+<style>
+  :root {
+    --bg: #f6f7fb; --surface: #ffffff; --surface-2: #eef0f7; --text: #161826; --muted: #5d6280;
+    --border: #e2e5f0; --accent: #5b5bf0; --accent-2: #a45bf0; --accent-soft: #5b5bf01a;
+    --good: #12a56b; --bad: #e0455a; --code-bg: #101322; --code-text: #e7eaff;
+    --shadow: 0 1px 2px #1a1d3a0d, 0 8px 28px #1a1d3a10;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0c0e18; --surface: #14172a; --surface-2: #1b1f36; --text: #eceefb; --muted: #9aa0c3;
+      --border: #272b47; --accent: #8b8bff; --accent-2: #c58bff; --accent-soft: #8b8bff22;
+      --good: #3ddc97; --bad: #ff7085; --code-bg: #0a0c17; --shadow: 0 1px 2px #0006, 0 8px 28px #0005;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0c0e18; --surface: #14172a; --surface-2: #1b1f36; --text: #eceefb; --muted: #9aa0c3;
+    --border: #272b47; --accent: #8b8bff; --accent-2: #c58bff; --accent-soft: #8b8bff22;
+    --good: #3ddc97; --bad: #ff7085; --code-bg: #0a0c17; --shadow: 0 1px 2px #0006, 0 8px 28px #0005;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 76px; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text); line-height: 1.6;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  a { color: var(--accent); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+
+  /* top bar */
+  header.bar {
+    position: sticky; top: 0; z-index: 20; backdrop-filter: blur(14px);
+    background: color-mix(in srgb, var(--bg) 82%, transparent); border-bottom: 1px solid var(--border);
+  }
+  .bar .wrap { display: flex; align-items: center; gap: 16px; height: 60px; }
+  .brand { font-weight: 800; letter-spacing: -.02em; display: flex; align-items: center; gap: 10px; }
+  .logo { width: 28px; height: 28px; border-radius: 9px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+  nav.top { margin-left: auto; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+  nav.top a { color: var(--muted); text-decoration: none; font-size: 14px; padding: 6px 12px; border-radius: 999px; white-space: nowrap; }
+  nav.top a:hover, nav.top a.on { color: var(--text); background: var(--accent-soft); }
+  .theme { border: 1px solid var(--border); background: var(--surface); color: var(--text); width: 38px; height: 38px; border-radius: 12px; cursor: pointer; font-size: 16px; flex: none; }
+
+  /* hero */
+  .hero { padding: 72px 0 40px; text-align: center; position: relative; overflow: hidden; }
+  .hero::before {
+    content: ""; position: absolute; inset: -40% -10% auto -10%; height: 520px; z-index: -1;
+    background: radial-gradient(closest-side, var(--accent-soft), transparent 70%),
+                radial-gradient(closest-side at 70% 30%, #a45bf022, transparent 70%);
+  }
+  .pill { display: inline-block; font-size: 13px; font-weight: 600; color: var(--accent); background: var(--accent-soft); padding: 6px 14px; border-radius: 999px; }
+  h1 { font-size: clamp(34px, 6vw, 60px); line-height: 1.05; letter-spacing: -.035em; margin: 18px 0 14px; }
+  h1 span { background: linear-gradient(120deg, var(--accent), var(--accent-2)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .lead { max-width: 640px; margin: 0 auto; color: var(--muted); font-size: 18px; }
+  .typing { margin: 34px auto 0; max-width: 560px; text-align: left; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 16px 18px; box-shadow: var(--shadow); }
+  .typing small { color: var(--muted); display: block; margin-bottom: 6px; }
+  .typing p { margin: 0; min-height: 52px; }
+  .caret { display: inline-block; width: 8px; height: 1.1em; background: var(--accent); vertical-align: -3px; margin-left: 2px; animation: blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* layout */
+  section { padding: 52px 0 8px; }
+  h2 { font-size: 30px; letter-spacing: -.025em; margin: 0 0 8px; }
+  .sub { color: var(--muted); margin: 0 0 26px; max-width: 700px; }
+  .grid { display: grid; gap: 16px; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .g4 { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 22px; box-shadow: var(--shadow); }
+  .card h3 { margin: 0 0 6px; font-size: 18px; letter-spacing: -.01em; }
+  .card p { margin: 0; color: var(--muted); }
+  .ico { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--accent-soft); font-size: 20px; margin-bottom: 12px; }
+  .step { font-weight: 800; color: var(--accent); font-size: 13px; letter-spacing: .08em; }
+
+  /* prompt blocks */
+  .prompt { position: relative; background: var(--code-bg); color: var(--code-text); border-radius: 16px; padding: 18px 18px 18px; margin: 12px 0 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13.5px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+  .prompt b { color: #ffc27a; font-weight: 600; }
+  .copy { position: absolute; top: 10px; right: 10px; border: 0; cursor: pointer; background: #ffffff1c; color: #fff; font: 600 12px inherit; padding: 6px 11px; border-radius: 9px; }
+  .copy:hover { background: #ffffff33; }
+  .prompt { padding-right: 84px; }
+
+  /* tabs */
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+  .tab { border: 1px solid var(--border); background: var(--surface); color: var(--muted); padding: 9px 16px; border-radius: 999px; cursor: pointer; font: 600 14px inherit; }
+  .tab[aria-selected="true"] { background: linear-gradient(120deg, var(--accent), var(--accent-2)); color: #fff; border-color: transparent; }
+  .panel[hidden] { display: none; }
+  .panel > .meta { color: var(--muted); margin: 0 0 4px; }
+
+  /* do / don't */
+  .vs { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 760px) { .vs { grid-template-columns: 1fr; } }
+  .vs .card.bad { border-top: 4px solid var(--bad); } .vs .card.good { border-top: 4px solid var(--good); }
+  .tag { font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+  .bad .tag { color: var(--bad); } .good .tag { color: var(--good); }
+  .vs q { display: block; margin-top: 8px; quotes: none; font-style: italic; }
+
+  /* builder */
+  .builder { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 860px) { .builder { grid-template-columns: 1fr; } }
+  label { display: block; font-size: 13px; font-weight: 700; margin: 12px 0 5px; }
+  input, textarea, select { width: 100%; font: inherit; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px; }
+  input:focus, textarea:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  textarea { resize: vertical; min-height: 64px; }
+
+  /* table-ish list */
+  .cheat { display: grid; gap: 10px; }
+  .row { display: grid; grid-template-columns: 190px 1fr; gap: 14px; padding: 14px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; }
+  .row b { color: var(--accent); }
+  @media (max-width: 640px) { .row { grid-template-columns: 1fr; gap: 2px; } }
+
+  details { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 4px 18px; margin-bottom: 10px; }
+  summary { cursor: pointer; font-weight: 700; padding: 12px 0; }
+  details p { margin: 0 0 14px; color: var(--muted); }
+
+  footer { margin: 70px 0 40px; text-align: center; color: var(--muted); font-size: 14px; }
+  .toast { position: fixed; left: 50%; bottom: 26px; transform: translate(-50%, 30px); opacity: 0; background: var(--text); color: var(--bg); padding: 10px 18px; border-radius: 999px; font-weight: 600; font-size: 14px; transition: .25s; pointer-events: none; z-index: 50; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <div class="brand"><div class="logo"></div> Prompt Guide</div>
+    <nav class="top" aria-label="Sections">
+      <a href="#basics">Basics</a><a href="#builder">Builder</a><a href="#modes">Bot modes</a>
+      <a href="#files">Files &amp; docs</a><a href="#advanced">Advanced</a><a href="#mistakes">Mistakes</a><a href="#faq">FAQ</a>
+    </nav>
+    <button class="theme" id="theme" aria-label="Toggle theme">◐</button>
+  </div>
+</header>
+
+<main>
+<div class="hero"><div class="wrap">
+  <span class="pill">For your Telegram AI assistant</span>
+  <h1>Get <span>better answers</span><br>with better prompts</h1>
+  <p class="lead">A prompt is just the message you send. This guide shows how to write messages that get precise answers, working code and ready-to-use files — in any language.</p>
+  <div class="typing" aria-live="off">
+    <small>Try it in the bot ↓</small>
+    <p id="demo"></p>
+  </div>
+</div></div>
+
+<div class="wrap">
+
+<!-- BASICS -->
+<section id="basics">
+  <h2>The 4-part formula</h2>
+  <p class="sub">You don't need magic words. Cover these four things and your answers improve immediately.</p>
+  <div class="grid g4">
+    <div class="card"><div class="ico">🎭</div><span class="step">1 · ROLE</span><h3>Who should it be?</h3><p>“You are a senior Python developer / a friendly nutritionist / a strict editor.”</p></div>
+    <div class="card"><div class="ico">🎯</div><span class="step">2 · TASK</span><h3>What exactly to do?</h3><p>One clear verb: write, fix, compare, translate, summarize, explain.</p></div>
+    <div class="card"><div class="ico">🧩</div><span class="step">3 · CONTEXT</span><h3>What should it know?</h3><p>Audience, goal, constraints, your level, paste the data or code.</p></div>
+    <div class="card"><div class="ico">📐</div><span class="step">4 · FORMAT</span><h3>How should it look?</h3><p>Bullets, table-like list, 100 words, JSON, a .docx file, step by step.</p></div>
+  </div>
+
+  <div class="vs" style="margin-top:22px">
+    <div class="card bad"><span class="tag">Vague</span><q>“Write about marketing.”</q><p style="margin-top:8px">No audience, no goal, no length. You get a generic essay.</p></div>
+    <div class="card good"><span class="tag">Specific</span><q>“Write 5 Instagram post ideas for a small bakery in Tashkent targeting students. Friendly tone, each with a hook and a call to action.”</q></div>
+  </div>
+</section>
+
+<!-- BUILDER -->
+<section id="builder">
+  <h2>Prompt builder</h2>
+  <p class="sub">Fill in the fields — the prompt is assembled live. Copy it and paste into the bot.</p>
+  <div class="builder">
+    <div class="card">
+      <label for="b-role">Role</label><input id="b-role" placeholder="a senior backend developer">
+      <label for="b-task">Task</label><textarea id="b-task" placeholder="Review this function and find bugs"></textarea>
+      <label for="b-ctx">Context</label><textarea id="b-ctx" placeholder="It runs on Python 3.12, handles payments, must be idempotent"></textarea>
+      <label for="b-fmt">Format</label>
+      <select id="b-fmt">
+        <option value="">— anything —</option>
+        <option>a short bulleted list</option><option>a step-by-step plan</option>
+        <option>a table-like list with columns separated by “|”</option>
+        <option>JSON only, no extra text</option><option>under 100 words</option>
+        <option>a detailed explanation with examples</option>
+      </select>
+      <label for="b-tone">Tone</label>
+      <select id="b-tone"><option value="">— neutral —</option><option>friendly</option><option>formal</option><option>playful</option><option>direct and concise</option></select>
+    </div>
+    <div class="card">
+      <h3>Your prompt</h3>
+      <div class="prompt" id="built" style="min-height:230px"></div>
+    </div>
+  </div>
+</section>
+
+<!-- MODES -->
+<section id="modes">
+  <h2>Prompts for each bot mode</h2>
+  <p class="sub">Pick a mode from the bot menu first — it tunes the assistant for the job. Then use templates like these. Replace <b style="color:var(--accent)">[brackets]</b>.</p>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div id="panels"></div>
+</section>
+
+<!-- FILES -->
+<section id="files">
+  <h2>Generating files &amp; reading documents</h2>
+  <p class="sub">Switch to <b>📄 Files</b> mode and describe the file. The bot writes it and sends it as a download.</p>
+  <div class="grid g2">
+    <div class="card"><div class="ico">📎</div><h3>What it can create</h3><p>Code files (.py .js .html .css .sql .sh), data (.csv .json .yaml), text (.md .txt) and Word documents (.docx). You can ask for several files at once.</p></div>
+    <div class="card"><div class="ico">📥</div><h3>What it can read</h3><p>Send a photo, a PDF, or a text/code file and write your question in the caption. Up to 10&nbsp;MB.</p></div>
+  </div>
+  <div class="prompt">Create a one-page CV in Word for [name], a [role] with [N] years of experience. Sections: Summary, Experience, Skills, Education. Use bullet points and a professional tone.<button class="copy">Copy</button></div>
+  <div class="prompt">Generate three files: index.html, style.css and script.js for a [to-do list] web app. Modern design, dark mode, saves to localStorage.<button class="copy">Copy</button></div>
+  <div class="prompt">Make a CSV with 20 realistic rows of fake customer data: id, name, email, country, signup_date (2024-2025), plan (free/pro).<button class="copy">Copy</button></div>
+  <p class="sub" style="margin-top:14px">💡 Under any answer tap <b>📎 Save as file</b> to download it. Tap <b>✂️ Shorter</b>, <b>📖 Detailed</b> or <b>🔄 Redo</b> to refine — no need to retype.</p>
+</section>
+
+<!-- ADVANCED -->
+<section id="advanced">
+  <h2>Level-up techniques</h2>
+  <div class="grid g2">
+    <div class="card"><div class="ico">🪜</div><h3>Ask for steps</h3><p>“Think through this step by step, then give the final answer.” Great for math, logic and debugging.</p></div>
+    <div class="card"><div class="ico">🧪</div><h3>Show an example</h3><p>Paste one sample of the output you want. “Format every answer like this: …” beats a long description.</p></div>
+    <div class="card"><div class="ico">🚧</div><h3>Set constraints</h3><p>“Max 80 words”, “no jargon”, “only use the data below”, “don't change the function signature”.</p></div>
+    <div class="card"><div class="ico">🔁</div><h3>Iterate</h3><p>Treat it as a conversation. “Make it funnier”, “shorter”, “now for beginners”. The bot remembers recent messages.</p></div>
+    <div class="card"><div class="ico">🧹</div><h3>Start fresh</h3><p>Switching topics? Tap <b>🧹 New chat</b> so old context doesn't leak into the new answer.</p></div>
+    <div class="card"><div class="ico">🔍</div><h3>Ask it to check itself</h3><p>“List your assumptions”, “What could be wrong with this answer?”, “Cite which part of my text you used.”</p></div>
+  </div>
+  <div class="prompt">Before answering, ask me up to 3 clarifying questions if anything is ambiguous. Then give the answer in under 150 words.<button class="copy">Copy</button></div>
+</section>
+
+<!-- MISTAKES -->
+<section id="mistakes">
+  <h2>Common mistakes</h2>
+  <div class="cheat">
+    <div class="row"><b>Too vague</b><span>“Help me with code” → say the language, the goal, and paste the code and the error.</span></div>
+    <div class="row"><b>Many tasks in one</b><span>Split big requests: outline first, then each part. Quality goes up.</span></div>
+    <div class="row"><b>No success criteria</b><span>Say what “good” means: length, audience, tone, must-include points.</span></div>
+    <div class="row"><b>Hidden context</b><span>The bot only knows what you tell it. Paste the relevant text instead of “the thing from before”.</span></div>
+    <div class="row"><b>Trusting blindly</b><span>For facts, numbers, medical, legal or financial topics, verify with a trusted source. Test generated code before using it.</span></div>
+    <div class="row"><b>Sharing secrets</b><span>Never paste passwords, API keys, or private personal data into any chat.</span></div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <h2>FAQ</h2>
+  <details><summary>Which language should I write in?</summary><p>Any. Use /lang to set the interface language. The bot answers in your language by default; to force another, say “answer in German”.</p></details>
+  <details><summary>The answer stopped mid-way.</summary><p>Very long answers hit a length limit. Write “continue” and it picks up where it stopped.</p></details>
+  <details><summary>How do I stop an answer?</summary><p>Tap ⏹ Stop under the animated message. Whatever was written so far is kept.</p></details>
+  <details><summary>Can it browse the internet or remember me forever?</summary><p>No live browsing. It remembers only your recent messages in the current chat; /new clears them.</p></details>
+  <details><summary>Can it generate images?</summary><p>It can <i>read</i> images and write image prompts or SVG/HTML graphics, but it does not draw pictures itself.</p></details>
+</section>
+
+<footer>Made for your Telegram AI assistant · Press <b>◐</b> to switch light / dark</footer>
+</div>
+</main>
+<div class="toast" id="toast">Copied ✓</div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const toast = (m = "Copied ✓") => { const t = $("#toast"); t.textContent = m; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 1400); };
+
+/* theme */
+const root = document.documentElement;
+try { const s = localStorage.getItem("theme"); if (s) root.dataset.theme = s; } catch (e) {}
+$("#theme").onclick = () => {
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+};
+
+/* hero typing demo */
+const demos = [
+  "Explain how DNS works to a 12-year-old, using a pizza delivery analogy. Max 120 words.",
+  "Write a Python function that validates an email, with 3 unit tests.",
+  "Translate to Uzbek, formal tone: “Your order has shipped and will arrive on Friday.”",
+  "Create a weekly meal plan for a vegetarian, 1800 kcal/day, as a Word document."
+];
+(function type() {
+  const el = $("#demo"); let i = 0, j = 0, del = false;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = demos[0]; return; }
+  (function tick() {
+    const full = demos[i];
+    el.innerHTML = full.slice(0, j) + '<span class="caret"></span>';
+    if (!del && j < full.length) { j++; return setTimeout(tick, 28); }
+    if (!del) { del = true; return setTimeout(tick, 1800); }
+    if (j > 0) { j -= 2; if (j < 0) j = 0; return setTimeout(tick, 12); }
+    del = false; i = (i + 1) % demos.length; setTimeout(tick, 300);
+  })();
+})();
+
+/* builder */
+function build() {
+  const v = id => $("#" + id).value.trim();
+  const p = [];
+  if (v("b-role")) p.push(`You are ${v("b-role")}.`);
+  p.push(v("b-task") || "<b>[Describe the task]</b>");
+  if (v("b-ctx")) p.push(`Context: ${v("b-ctx")}`);
+  if (v("b-fmt")) p.push(`Format: ${v("b-fmt")}.`);
+  if (v("b-tone")) p.push(`Tone: ${v("b-tone")}.`);
+  const text = p.join("\n\n").replace(/<\/?b>/g, "");
+  const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+  const box = $("#built");
+  box.dataset.raw = text;
+  box.innerHTML = esc(text) + '<button class="copy">Copy</button>';
+}
+$$(".builder input, .builder textarea, .builder select").forEach(e => e.addEventListener("input", build));
+build();
+
+/* mode templates */
+const MODES = [
+  ["💬 Chat", "Everyday questions, ideas, decisions.", [
+    "Give me 5 name ideas for a [type of business]. Short, easy to spell in English and Uzbek, with a one-line reason each.",
+    "I'm deciding between [A] and [B] for [goal]. Compare them by cost, effort and risk, then recommend one and explain why.",
+    "Plan a 3-day trip to [city] for [who] with a budget of [amount]. Group by day, include food and transport tips."]],
+  ["👨‍💻 Code", "Write, debug, refactor, explain.", [
+    "Write a [language] function that [does X]. Input: [..]. Output: [..]. Handle edge cases: [..]. Include a usage example and 3 tests.",
+    "Here is my code and the error. Find the root cause first, then show the fixed code.\n\nCode:\n[paste]\n\nError:\n[paste]",
+    "Refactor this code for readability and performance without changing behavior. Explain each change in one line.\n\n[paste code]",
+    "Explain what this code does line by line as if I'm a beginner:\n\n[paste code]"]],
+  ["📄 Files", "Get downloadable files.", [
+    "Create a README.md for a project called [name] that [does X]. Sections: overview, install, usage, examples, license.",
+    "Write a Python script (file: backup.py) that zips a folder and uploads it to [service]. Add comments and a requirements.txt.",
+    "Make a project plan as a Word document: goals, milestones with dates, risks, owners. Project: [..]"]],
+  ["🌐 Translate", "Accurate, natural translations.", [
+    "Translate to [language], keep a [formal/casual] tone and keep names and numbers unchanged:\n\n[text]",
+    "Translate this into English, then list any idioms you had to adapt:\n\n[text]",
+    "Give me 3 versions of this sentence in [language]: literal, natural, and polite.\n\n[sentence]"]],
+  ["📝 Summarize", "Condense text, articles, PDFs.", [
+    "Summarize in 5 bullet points, then list any action items:\n\n[paste text]",
+    "(Send a PDF with this caption) Give a one-sentence TL;DR, the 5 key findings, and any numbers worth remembering.",
+    "Summarize this for a busy executive in under 80 words:\n\n[text]"]],
+  ["✍️ Writer", "Emails, posts, stories, editing.", [
+    "Write a polite email to [recipient] asking for [request]. Context: [..]. Under 120 words, clear call to action.",
+    "Improve this text: fix grammar, make it clearer and more engaging, keep my voice. Then list what you changed.\n\n[text]",
+    "Write a LinkedIn post about [topic] with a strong first line, 3 short paragraphs and 3 hashtags."]],
+  ["🎓 Tutor", "Learn anything step by step.", [
+    "Teach me [topic] from scratch. I know [my level]. Use one analogy, one worked example, then quiz me with 3 questions.",
+    "Explain the difference between [A] and [B] with a simple example for each.",
+    "Create a 4-week study plan to learn [skill] with [hours] hours per week. Include practice tasks."]],
+  ["🔬 Analyze", "Data, images, PDFs, logic.", [
+    "(Send a photo with this caption) What is shown here? List key details, then anything unusual or risky.",
+    "Here is my data:\n[paste]\nFind trends, outliers and give 3 recommendations. State your assumptions.",
+    "Evaluate this business idea: [idea]. Give strengths, weaknesses, the biggest risk, and a first experiment to test it cheaply."]],
+];
+const tabs = $("#tabs"), panels = $("#panels");
+const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+MODES.forEach(([name, meta, items], i) => {
+  const b = document.createElement("button");
+  b.className = "tab"; b.role = "tab"; b.textContent = name; b.setAttribute("aria-selected", i === 0);
+  b.onclick = () => { $$(".tab").forEach((t, k) => t.setAttribute("aria-selected", k === i)); $$(".panel").forEach((p, k) => p.hidden = k !== i); };
+  tabs.appendChild(b);
+  const p = document.createElement("div"); p.className = "panel"; p.hidden = i !== 0;
+  p.innerHTML = `<p class="meta">${meta}</p>` + items.map(t =>
+    `<div class="prompt" data-raw="${esc(t).replace(/"/g, "&quot;")}">${esc(t).replace(/\[[^\]]+\]/g, m => `<b>${m}</b>`)}<button class="copy">Copy</button></div>`).join("");
+  panels.appendChild(p);
+});
+
+/* copy buttons (event delegation) */
+document.addEventListener("click", e => {
+  const btn = e.target.closest(".copy"); if (!btn) return;
+  const box = btn.parentElement;
+  const text = box.dataset.raw ?? box.textContent.replace(/Copy$/, "").trim();
+  const done = () => toast();
+  if (navigator.clipboard && window.isSecureContext !== false) navigator.clipboard.writeText(text).then(done, fallback);
+  else fallback();
+  function fallback() {
+    const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); done(); } catch (_) { toast("Select & copy manually"); } ta.remove();
+  }
+});
+
+/* active nav */
+const links = $$("nav.top a");
+const io = new IntersectionObserver(es => es.forEach(en => {
+  if (en.isIntersecting) links.forEach(a => a.classList.toggle("on", a.getAttribute("href") === "#" + en.target.id));
+}), { rootMargin: "-40% 0px -55% 0px" });
+$$("section").forEach(s => io.observe(s));
+</script>
+</body>
+</html>
